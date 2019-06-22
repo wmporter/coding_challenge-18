@@ -251,7 +251,17 @@ a["[object Object]"] = 333;
 
 ---
 
-## Question 9
+## Question 9 (as-is)
+```js
+for (var i = 0; i < 5; i++) {
+  setTimeout(function() { console.log(i); }, i * 1000 );
+}
+
+for (let i = 0; i < 5; i++) {
+  setTimeout(function() { console.log(i); }, i * 1000 );
+```
+
+## Question 9 (corrected)
 ```js
 for (var i = 0; i < 5; i++) {
   setTimeout(function() { console.log(i); }, i * 1000 );
@@ -277,10 +287,26 @@ for (let i = 0; i < 5; i++) {
 ```
 
 ## Question 9 Explanation
-The first loop logs the `i` defined using `var` which gets hoisted to the global scope. A loop that only iterates 5 times executes so quickly that by the time any of the setTimeout callbacks are called, the value of `i` is equal to 5. 
+Another minor typo in the original question 9. It was missing a closing brace for the second for loop, so _Question 9 (corrected)_ has the working syntax.
 
-The second loop logs the `i` defined using `let`. Because `let` variables are local to the scope in which they're defined and , the anonymous function used as a callback
-Each for loop executes in succession, calling setTimeout a total of 10 times. 
+This output seems really confusing at first glance. What if we annotate it a little bit so we can have a better idea of what's going on? We'll call the first loop the 'var loop' and the second one the 'let loop'. Change the callbacks in each loop to `console.log(i, 'var loop')` and `console.log(i, 'let loop')`, and the output becomes:
+```
+5 var loop
+0 let loop
+5 var loop
+1 let loop
+5 var loop
+2 let loop
+5 var loop
+3 let loop
+5 var loop
+4 let loop
+```
+The first loop logs the `i` defined using `var` which gets [hoisted](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/var#var_hoisting) to the global scope. A loop that only iterates 5 times executes so quickly that by the time any of the setTimeout callbacks are called, the value of `i` is equal to 5. 
+
+The second loop logs the `i` defined using `let`. We define a callback function inside the for loop's scope, which creates a [closure](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures) that contains the `i` variable. This is different than the "var loop" because using `let` makes it so the value of `i` when the function is _defined_ will be the same when it's _called_ (we say that the closure "binds" the variable). The for loop continues to execute, but each `i` value is "saved" for each callback function we define. 
+
+In both loops, the value `i * 1000` passed to setTimeout is evaluated immediately, so the amount of time they wait, in seconds, is 0, 1, 2, etc.
 
 ---
 
